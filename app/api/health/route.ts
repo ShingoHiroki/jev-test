@@ -1,8 +1,12 @@
-import { NextResponse } from "next/server";
+import { corsJson, corsPreflight } from "@/lib/cors";
 import { detectProvider } from "@/lib/jev";
 import type { HealthResponse } from "@/lib/types";
 
-export async function GET() {
+export function OPTIONS(request: Request) {
+  return corsPreflight(request);
+}
+
+export async function GET(request: Request) {
   const body: HealthResponse = { provider: detectProvider() };
-  return NextResponse.json(body);
+  return corsJson(request, body);
 }

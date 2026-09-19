@@ -208,14 +208,13 @@ export function WatchApp() {
 
       {!jevReady ? (
         <p className="banner">
-          サイト自体は無料で公開できます。今はデモエンジンなので API
-          キーも課金も不要です。本物の Jev 対局は TypeSafe の従量課金で、1局だいたい
-          $0.002 以下です。
+          GitHub Pages は静的サイトなので、シークレットの Jev
+          キーはここでは使えません。デモ対局は無料です。本物の Jev
+          にするには Vercel などにキーを置いてください。
         </p>
       ) : (
         <p className="banner ok">
-          Jev 接続先: {provider === "typesafe" ? "TypeSafe API" : "OpenRouter"}。白も黒も同じ
-          Jev が指します。公開してもホスティングは無料で、かかるのは Jev の API 代だけです。
+          Jev 接続先: {provider === "typesafe" ? "TypeSafe API" : "OpenRouter"}。キーはサーバー側にあり、ブラウザには出ていません。
         </p>
       )}
 

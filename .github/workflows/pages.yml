@@ -1,8 +1,10 @@
-name: Deploy GitHub Pages
+name: Deploy GitHub Pages from main
 
 on:
   push:
-    branches: [main, cursor/jev-chess-watch-8ffa]
+    branches: [main]
+    paths-ignore:
+      - "docs/**"
   workflow_dispatch:
 
 permissions:
@@ -13,10 +15,24 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
+  check-jev-key:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - name: Verify TYPESAFE_API_KEY if present
+        env:
+          TYPESAFE_API_KEY: ${{ secrets.TYPESAFE_API_KEY }}
+        run: node scripts/check-jev-key.mjs
+
   build-and-deploy:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
       - uses: actions/setup-node@v4
         with:
           node-version: 22
@@ -29,9 +45,20 @@ jobs:
         env:
           GITHUB_PAGES: "true"
           NEXT_PUBLIC_BASE_PATH: /jev-test
-      - run: touch out/.nojekyll
-      - uses: peaceiris/actions-gh-pages@v4
-        with:
-          github_token: ${{ secrets.GITHUB_TOKEN }}
-          publish_dir: ./out
-          force_orphan: true
+          NEXT_PUBLIC_API_BASE: ${{ vars.API_BASE }}
+      - name: Publish docs/ on main
+        run: |
+          set -euo pipefail
+          rm -rf docs
+          mkdir -p docs
+          cp -a out/. docs/
+          touch docs/.nojekyll
+          git add -f docs
+          if git diff --staged --quiet; then
+            echo "No docs changes"
+            exit 0
+          fi
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git commit -m "Update GitHub Pages site from main [skip ci]"
+          git push

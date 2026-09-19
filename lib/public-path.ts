@@ -5,7 +5,9 @@ export function publicBasePath(): string {
 }
 
 export function apiUrl(path: string): string {
-  const base = publicBasePath();
+  const apiBase = (process.env.NEXT_PUBLIC_API_BASE ?? "").replace(/\/$/, "");
+  const siteBase = publicBasePath();
   const normalized = path.startsWith("/") ? path : `/${path}`;
-  return `${base}${normalized}`;
+  if (apiBase) return `${apiBase}${normalized}`;
+  return `${siteBase}${normalized}`;
 }
