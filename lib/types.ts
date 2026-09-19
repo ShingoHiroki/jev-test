@@ -33,6 +33,7 @@ export type MoveResponse = {
   latencyMs: number;
   confidence: number | null;
   probability: number | null;
+  probabilities: Record<string, number>;
   topMoves: RankedMove[];
   model: string;
   inputTokens: number;
@@ -48,8 +49,10 @@ export type PlyRecord = {
   latencyMs: number;
   confidence: number | null;
   probability: number | null;
+  probabilities: Record<string, number>;
   topMoves: RankedMove[];
   model: string;
+  inputTokens: number;
 };
 
 export type TimingSummary = {

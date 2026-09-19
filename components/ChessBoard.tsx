@@ -1,15 +1,7 @@
 import type { ReactNode } from "react";
 import type { Color } from "@/lib/types";
 import { squareName } from "@/lib/chess";
-
-const UNICODE: Record<string, string> = {
-  k: "♚",
-  q: "♛",
-  r: "♜",
-  b: "♝",
-  n: "♞",
-  p: "♟",
-};
+import { ChessPiece } from "./ChessPiece";
 
 type Piece = { type: string; color: "w" | "b" };
 
@@ -91,11 +83,7 @@ function renderSquare({
       key={name}
       className={`square ${isDark ? "dark" : "light"}${isLast ? " last" : ""}`}
     >
-      {piece ? (
-        <span className={`piece ${piece.color === "w" ? "white-piece" : "black-piece"}`}>
-          {UNICODE[piece.type]}
-        </span>
-      ) : null}
+      {piece ? <ChessPiece type={piece.type} color={piece.color} /> : null}
       {showFile ? <span className="coord file">{name[0]}</span> : null}
       {showRank ? <span className="coord rank">{name[1]}</span> : null}
     </div>
