@@ -161,11 +161,11 @@ button:disabled {
 
 .panel {
   border-radius: var(--radius);
-  padding: 20px;
+  padding: 16px 18px;
   min-height: 0;
   display: flex;
   flex-direction: column;
-  gap: 14px;
+  gap: 12px;
 }
 
 .panel-head {
@@ -229,8 +229,14 @@ button:disabled {
   background: var(--black);
 }
 
+.board-panel .player,
+.board-panel .board-foot,
+.board-panel .panel-head {
+  flex-shrink: 0;
+}
+
 .board-wrap {
-  width: min(100%, 560px);
+  width: min(100%, 440px, 54vh);
   margin: 0 auto;
 }
 
@@ -270,27 +276,27 @@ button:disabled {
 .white-piece {
   color: #fffdf8;
   text-shadow:
-    -1px -1px 0 #4a3420,
-    1px -1px 0 #4a3420,
-    -1px 1px 0 #4a3420,
-    1px 1px 0 #4a3420,
-    0 6px 10px rgba(0, 0, 0, 0.28);
+    -1.2px -1.2px 0 #3a2718,
+    1.2px -1.2px 0 #3a2718,
+    -1.2px 1.2px 0 #3a2718,
+    1.2px 1.2px 0 #3a2718,
+    0 5px 8px rgba(0, 0, 0, 0.28);
 }
 
 .black-piece {
   color: #1b130d;
   text-shadow:
-    -1px -1px 0 #f7ead3,
-    1px -1px 0 #f7ead3,
-    -1px 1px 0 #f7ead3,
-    1px 1px 0 #f7ead3;
+    -1.2px -1.2px 0 #f4e4c8,
+    1.2px -1.2px 0 #f4e4c8,
+    -1.2px 1.2px 0 #f4e4c8,
+    1.2px 1.2px 0 #f4e4c8;
 }
 
 .coord {
   position: absolute;
-  font-size: 10px;
-  font-weight: 700;
-  opacity: 0.7;
+  font-size: 11px;
+  font-weight: 800;
+  color: rgba(40, 24, 12, 0.72);
 }
 
 .coord.file {
@@ -315,6 +321,8 @@ button:disabled {
   background: var(--bg-2);
   border-radius: 14px;
   padding: 12px;
+  display: grid;
+  gap: 4px;
 }
 
 .muted {
