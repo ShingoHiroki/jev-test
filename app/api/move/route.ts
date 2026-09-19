@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import { playNextMove } from "@/lib/play";
+import { allowJevMove } from "@/lib/rate-limit";
 import type { EngineMode } from "@/lib/types";
 
 export async function POST(request: Request) {
@@ -10,6 +11,13 @@ export async function POST(request: Request) {
     }
 
     const mode = body.mode === "demo" ? "demo" : "jev";
+    if (mode === "jev" && !allowJevMove(request)) {
+      return NextResponse.json(
+        { error: "Jev の呼び出しが多すぎます。しばらく待ってから再開してください。" },
+        { status: 429 },
+      );
+    }
+
     const result = await playNextMove({ fen: body.fen, mode });
     return NextResponse.json(result);
   } catch (error) {

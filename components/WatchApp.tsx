@@ -4,6 +4,8 @@ import { useCallback, useEffect, useRef, useState } from "react";
 import { BoardPanel } from "./BoardPanel";
 import { TimingPanel } from "./TimingPanel";
 import { STARTING_FEN, colorFromTurn, getGameStatus, parseUci } from "@/lib/chess";
+import { playDemoMove } from "@/lib/play-demo";
+import { apiUrl } from "@/lib/public-path";
 import type { EngineMode, GameStatus, HealthResponse, MoveResponse, PlyRecord } from "@/lib/types";
 import { Chess } from "chess.js";
 
@@ -35,8 +37,11 @@ export function WatchApp() {
   modeRef.current = mode;
 
   useEffect(() => {
-    fetch("/api/health")
-      .then((res) => res.json() as Promise<HealthResponse>)
+    fetch(apiUrl("/api/health"))
+      .then((res) => {
+        if (!res.ok) throw new Error("health unavailable");
+        return res.json() as Promise<HealthResponse>;
+      })
       .then((health) => {
         setProvider(health.provider);
         if (health.provider !== "none") setMode("jev");
@@ -92,16 +97,7 @@ export function WatchApp() {
         setThinking(true);
         setThinkMs(0);
 
-        const response = await fetch("/api/move", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          signal: abort.signal,
-          body: JSON.stringify({ fen: fenRef.current, mode: modeRef.current }),
-        });
-        const payload = (await response.json()) as MoveResponse & { error?: string };
-        if (!response.ok) {
-          throw new Error(payload.error ?? "指し手の取得に失敗しました");
-        }
+        const payload = await requestMove(fenRef.current, modeRef.current, abort.signal);
 
         const nextPlies: PlyRecord[] = [
           ...pliesRef.current,
@@ -212,12 +208,14 @@ export function WatchApp() {
 
       {!jevReady ? (
         <p className="banner">
-          `TYPESAFE_API_KEY` が無いのでデモエンジンで動かせます。Jev
-          同士の対局にするには `.env.local` に TypeSafe または OpenRouter のキーを入れてください。
+          サイト自体は無料で公開できます。今はデモエンジンなので API
+          キーも課金も不要です。本物の Jev 対局は TypeSafe の従量課金で、1局だいたい
+          $0.002 以下です。
         </p>
       ) : (
         <p className="banner ok">
-          Jev 接続先: {provider === "typesafe" ? "TypeSafe API" : "OpenRouter"}。白も黒も同じ Jev が指します。
+          Jev 接続先: {provider === "typesafe" ? "TypeSafe API" : "OpenRouter"}。白も黒も同じ
+          Jev が指します。公開してもホスティングは無料で、かかるのは Jev の API 代だけです。
         </p>
       )}
 
@@ -262,4 +260,26 @@ function wait(ms: number, signal: AbortSignal) {
     }
     signal.addEventListener("abort", onAbort, { once: true });
   });
+}
+
+async function requestMove(
+  fen: string,
+  mode: EngineMode,
+  signal: AbortSignal,
+): Promise<MoveResponse> {
+  if (mode === "demo") {
+    return playDemoMove(fen, signal);
+  }
+
+  const response = await fetch(apiUrl("/api/move"), {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    signal,
+    body: JSON.stringify({ fen, mode }),
+  });
+  const payload = (await response.json()) as MoveResponse & { error?: string };
+  if (!response.ok) {
+    throw new Error(payload.error ?? "指し手の取得に失敗しました");
+  }
+  return payload;
 }

@@ -12,6 +12,7 @@ import {
   toUci,
 } from "@/lib/chess";
 import { pickDemoMove } from "@/lib/demo-engine";
+import { playDemoMove } from "@/lib/play-demo";
 import { playNextMove } from "@/lib/play";
 import { summarizeTiming } from "@/lib/timing";
 import type { CandidateMove, PlyRecord } from "@/lib/types";
@@ -135,7 +136,10 @@ describe("timing summary", () => {
 
 describe("playNextMove demo", () => {
   it("returns a legal SAN move and a later FEN", async () => {
-    const result = await playNextMove({
+    const result = await playDemoMove(
+      "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1",
+    );
+    const viaPlay = await playNextMove({
       fen: "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1",
       mode: "demo",
     });
@@ -145,5 +149,6 @@ describe("playNextMove demo", () => {
     expect(result.color).toBe("white");
     expect(result.latencyMs).toBeGreaterThan(0);
     expect(result.model).toBe("demo-engine");
+    expect(viaPlay.model).toBe("demo-engine");
   });
 });
