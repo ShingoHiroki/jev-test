@@ -20,7 +20,12 @@ Jev に公式の無料枠はありません。公開サイトに自分の API �
 
 https://shingohiroki.github.io/jev-test/
 
-初回はリポジトリの **Settings → Pages → Source: GitHub Actions** を一度選ぶ必要があります。
+初回だけリポジトリの **Settings → Pages** で次を選んでください。
+
+- Source: **Deploy from a branch**
+- Branch: **gh-pages** / **/(root)**
+
+GitHub Actions が `gh-pages` ブランチへ静的サイトを出します。この設定のあとに公開 URL が開くようになります。
 
 Vercel に出す場合は GitHub リポジトリを Import するだけで、Hobby プランならホスティングは無料です。本物の Jev にするときだけ `TYPESAFE_API_KEY` を Environment Variable に入れてください。
 
