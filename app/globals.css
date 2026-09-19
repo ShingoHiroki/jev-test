@@ -162,10 +162,10 @@ button:disabled {
 .panel {
   border-radius: var(--radius);
   padding: 20px;
-  min-height: 720px;
+  min-height: 0;
   display: flex;
   flex-direction: column;
-  gap: 16px;
+  gap: 14px;
 }
 
 .panel-head {
@@ -204,10 +204,15 @@ button:disabled {
   border-color: var(--accent);
 }
 
-.player span:last-child {
+.player > div span {
   display: block;
   color: var(--muted);
   font-size: 12px;
+}
+
+.player .pulse {
+  margin-left: auto;
+  font-variant-numeric: tabular-nums;
 }
 
 .dot {

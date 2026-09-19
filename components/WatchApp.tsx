@@ -230,8 +230,9 @@ export function WatchApp() {
           status={status}
           turn={turn}
           thinking={thinking}
-          thinkMs={last && !thinking ? last.latencyMs : thinkMs}
+          thinkMs={thinkMs}
           lastSan={last?.san ?? null}
+          lastLatencyMs={last?.latencyMs ?? null}
         />
         <TimingPanel
           plies={plies}

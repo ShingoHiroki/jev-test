@@ -1,9 +1,20 @@
 import { Chess, type Move, type Square } from "chess.js";
 import type { CandidateMove, Color, GameStatus } from "./types";
 
+export const FILES = ["a", "b", "c", "d", "e", "f", "g", "h"] as const;
+
+export function squareName(
+  rankIndex: number,
+  fileIndex: number,
+  orientation: Color,
+): string {
+  const file = orientation === "white" ? FILES[fileIndex] : FILES[7 - fileIndex];
+  const rank = orientation === "white" ? 8 - rankIndex : rankIndex + 1;
+  return `${file}${rank}`;
+}
+
 export const STARTING_FEN =
   "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1";
-
 export const MAX_CHOICES = 255;
 
 export function parseUci(uci: string): {

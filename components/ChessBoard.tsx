@@ -1,22 +1,15 @@
 import type { ReactNode } from "react";
 import type { Color } from "@/lib/types";
+import { squareName } from "@/lib/chess";
 
 const UNICODE: Record<string, string> = {
-  wK: "♔",
-  wQ: "♕",
-  wR: "♖",
-  wB: "♗",
-  wN: "♘",
-  wP: "♙",
-  bK: "♚",
-  bQ: "♛",
-  bR: "♜",
-  bB: "♝",
-  bN: "♞",
-  bP: "♟",
+  k: "♚",
+  q: "♛",
+  r: "♜",
+  b: "♝",
+  n: "♞",
+  p: "♟",
 };
-
-const FILES = ["a", "b", "c", "d", "e", "f", "g", "h"];
 
 type Piece = { type: string; color: "w" | "b" };
 
@@ -74,12 +67,6 @@ export function ChessBoard({
   );
 }
 
-function squareName(rankIndex: number, fileIndex: number, orientation: Color): string {
-  const file = orientation === "white" ? FILES[fileIndex] : FILES[7 - fileIndex];
-  const rank = orientation === "white" ? 8 - rankIndex : rankIndex + 1;
-  return `${file}${rank}`;
-}
-
 function renderSquare({
   rankIndex,
   fileIndex,
@@ -106,7 +93,7 @@ function renderSquare({
     >
       {piece ? (
         <span className={`piece ${piece.color === "w" ? "white-piece" : "black-piece"}`}>
-          {UNICODE[`${piece.color}${piece.type.toUpperCase()}`]}
+          {UNICODE[piece.type]}
         </span>
       ) : null}
       {showFile ? <span className="coord file">{name[0]}</span> : null}

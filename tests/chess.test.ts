@@ -8,6 +8,7 @@ import {
   listLegalMoves,
   resolveChosenMove,
   selectCandidateMoves,
+  squareName,
   toUci,
 } from "@/lib/chess";
 import { pickDemoMove } from "@/lib/demo-engine";
@@ -64,6 +65,13 @@ describe("chess helpers", () => {
         promotion: "q",
       }),
     ).toContain("promote to q");
+  });
+
+  it("maps board indices to algebraic squares", () => {
+    expect(squareName(0, 0, "white")).toBe("a8");
+    expect(squareName(7, 0, "white")).toBe("a1");
+    expect(squareName(7, 7, "white")).toBe("h1");
+    expect(squareName(0, 0, "black")).toBe("h1");
   });
 });
 

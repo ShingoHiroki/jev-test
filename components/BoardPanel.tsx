@@ -26,6 +26,7 @@ export function BoardPanel({
   thinking,
   thinkMs,
   lastSan,
+  lastLatencyMs,
 }: {
   fen: string;
   lastMove: { from: string; to: string } | null;
@@ -34,6 +35,7 @@ export function BoardPanel({
   thinking: boolean;
   thinkMs: number;
   lastSan: string | null;
+  lastLatencyMs: number | null;
 }) {
   return (
     <section className="panel board-panel">
@@ -45,26 +47,23 @@ export function BoardPanel({
         <p className="status-pill">{statusText(status, thinking, turn)}</p>
       </header>
 
-      <div className="players">
-        <div className={`player ${turn === "black" && status.type === "in_progress" ? "active" : ""}`}>
-          <span className="dot black" />
-          <div>
-            <strong>黒 · Jev</strong>
-            <span>Black</span>
-          </div>
-        </div>
-        <div className={`player ${turn === "white" && status.type === "in_progress" ? "active" : ""}`}>
-          <span className="dot white" />
-          <div>
-            <strong>白 · Jev</strong>
-            <span>White</span>
-          </div>
-        </div>
-      </div>
+      <PlayerRow
+        color="black"
+        active={turn === "black" && status.type === "in_progress"}
+        thinking={thinking && turn === "black"}
+        thinkMs={thinkMs}
+      />
 
       <div className="board-wrap">
         <ChessBoard fen={fen} lastMove={lastMove} />
       </div>
+
+      <PlayerRow
+        color="white"
+        active={turn === "white" && status.type === "in_progress"}
+        thinking={thinking && turn === "white"}
+        thinkMs={thinkMs}
+      />
 
       <footer className="board-foot">
         <div>
@@ -72,12 +71,34 @@ export function BoardPanel({
           <strong>{lastSan ?? "—"}</strong>
         </div>
         <div>
-          <span className="muted">今回の思考時間</span>
-          <strong className={thinking ? "pulse" : ""}>
-            {thinking ? formatMs(thinkMs) : lastSan ? formatMs(thinkMs) : "—"}
-          </strong>
+          <span className="muted">直前の判断時間</span>
+          <strong>{lastLatencyMs == null ? "—" : formatMs(lastLatencyMs)}</strong>
         </div>
       </footer>
     </section>
+  );
+}
+
+function PlayerRow({
+  color,
+  active,
+  thinking,
+  thinkMs,
+}: {
+  color: Color;
+  active: boolean;
+  thinking: boolean;
+  thinkMs: number;
+}) {
+  const isWhite = color === "white";
+  return (
+    <div className={`player ${active ? "active" : ""}`}>
+      <span className={`dot ${color}`} />
+      <div>
+        <strong>{isWhite ? "白 · Jev" : "黒 · Jev"}</strong>
+        <span>{isWhite ? "White" : "Black"}</span>
+      </div>
+      {thinking ? <strong className="pulse">{formatMs(thinkMs)}</strong> : null}
+    </div>
   );
 }
