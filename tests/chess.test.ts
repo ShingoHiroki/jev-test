@@ -12,10 +12,23 @@ import {
   toUci,
 } from "@/lib/chess";
 import { pickDemoMove } from "@/lib/demo-engine";
+import { rankedProbabilities, toDecisionJson } from "@/lib/decision";
 import { playDemoMove } from "@/lib/play-demo";
 import { playNextMove } from "@/lib/play";
 import { summarizeTiming } from "@/lib/timing";
 import type { CandidateMove, PlyRecord } from "@/lib/types";
+
+function samplePly(overrides: Partial<PlyRecord> & Pick<PlyRecord, "ply" | "color" | "san" | "uci" | "latencyMs">): PlyRecord {
+  return {
+    confidence: null,
+    probability: null,
+    probabilities: {},
+    topMoves: [],
+    model: "demo-engine",
+    inputTokens: 0,
+    ...overrides,
+  };
+}
 
 describe("chess helpers", () => {
   it("lists legal starting moves as UCI", () => {
@@ -90,7 +103,7 @@ describe("demo engine", () => {
 describe("timing summary", () => {
   it("averages white and black decision times separately", () => {
     const plies: PlyRecord[] = [
-      {
+      samplePly({
         ply: 1,
         color: "white",
         san: "e4",
@@ -98,10 +111,8 @@ describe("timing summary", () => {
         latencyMs: 100,
         confidence: 0.8,
         probability: 0.5,
-        topMoves: [],
-        model: "demo-engine",
-      },
-      {
+      }),
+      samplePly({
         ply: 2,
         color: "black",
         san: "e5",
@@ -109,10 +120,8 @@ describe("timing summary", () => {
         latencyMs: 300,
         confidence: 0.7,
         probability: 0.4,
-        topMoves: [],
-        model: "demo-engine",
-      },
-      {
+      }),
+      samplePly({
         ply: 3,
         color: "white",
         san: "Nf3",
@@ -120,9 +129,7 @@ describe("timing summary", () => {
         latencyMs: 200,
         confidence: 0.6,
         probability: 0.3,
-        topMoves: [],
-        model: "demo-engine",
-      },
+      }),
     ];
     expect(summarizeTiming(plies)).toMatchObject({
       count: 3,
@@ -150,5 +157,42 @@ describe("playNextMove demo", () => {
     expect(result.latencyMs).toBeGreaterThan(0);
     expect(result.model).toBe("demo-engine");
     expect(viaPlay.model).toBe("demo-engine");
+    expect(result.probabilities[result.uci]).toBeGreaterThan(0);
+    expect(result.topMoves[0]?.uci).toBe(result.uci);
+  });
+});
+
+describe("decision json", () => {
+  it("exposes the chosen move, probabilities, and model", () => {
+    const ply = samplePly({
+      ply: 1,
+      color: "white",
+      san: "e4",
+      uci: "e2e4",
+      latencyMs: 120,
+      confidence: 0.8,
+      probability: 0.55,
+      probabilities: { e2e4: 0.55, d2d4: 0.3, g1f3: 0.15 },
+      topMoves: [
+        { uci: "e2e4", san: "e4", probability: 0.55 },
+        { uci: "d2d4", san: "d4", probability: 0.3 },
+        { uci: "g1f3", san: "Nf3", probability: 0.15 },
+      ],
+      model: "jev-latest",
+      inputTokens: 42,
+    });
+
+    expect(toDecisionJson(ply)).toEqual({
+      model: "jev-latest",
+      answers: {
+        move: {
+          choice: "e2e4",
+          confidence: 0.8,
+          probabilities: { e2e4: 0.55, d2d4: 0.3, g1f3: 0.15 },
+        },
+      },
+      usage: { input_tokens: 42 },
+    });
+    expect(rankedProbabilities(ply).map((move) => move.san)).toEqual(["e4", "d4", "Nf3"]);
   });
 });

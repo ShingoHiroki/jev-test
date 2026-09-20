@@ -120,7 +120,7 @@ export function resolveChosenMove(
 export function topMoves(
   legalMoves: CandidateMove[],
   probabilities: Record<string, number>,
-  limit = 3,
+  limit = 8,
 ) {
   return [...legalMoves]
     .map((move) => ({

@@ -109,8 +109,10 @@ export function WatchApp() {
             latencyMs: payload.latencyMs,
             confidence: payload.confidence,
             probability: payload.probability,
+            probabilities: payload.probabilities,
             topMoves: payload.topMoves,
             model: payload.model,
+            inputTokens: payload.inputTokens,
           },
         ];
 
