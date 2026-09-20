@@ -4,42 +4,37 @@ TypeSafe の System One モデル **Jev** 同士でチェスを指させ、ひ�
 
 左が盤面、右が各手の判断時間です。白も黒も同じ Jev が、その局面の合法手から 1 手選びます。
 
-## GitHub Pages（main を公開）
+## GitHub Pages（main / docs）
 
-公開の元ブランチは **main** です。`main` への push で Actions が静的サイトを `docs/` に書き、GitHub Pages がそれを配信します。
+公開 URL: https://shingohiroki.github.io/jev-test/
 
-初回だけリポジトリの **Settings → Pages** で次を選んでください。
+`docs/` に出しているのは静的な HTML/JS だけです。Jev のキーはビルド成果物に含まれません。Pages 上の対局はデモエンジンです。
 
-- Source: **Deploy from a branch**
-- Branch: **main**
-- Folder: **/docs**
+## キーは漏れないか
 
-公開 URL:
+漏れません。条件は次のとおりです。
 
-https://shingohiroki.github.io/jev-test/
+- GitHub には **Actions secret** として `TYPESAFE_API_KEY` を置く（`NEXT_PUBLIC_TYPESAFE_API_KEY` にはしない）
+- Vercel にもサーバー用の Environment Variable として **`TYPESAFE_API_KEY`** を置く（名前の先頭に `NEXT_PUBLIC_` を付けない）
+- `.env.local` はコミットしない
 
-`main` のルート（ソースコード）を直接 Pages にすると `.tsx` がそのまま出るので、必ず **/docs** を選んでください。
+Vercel では `/api/move` だけがキーを使います。ブラウザに渡るのは指し手と所要時間です。
 
-## Jev の API キーを GitHub シークレットに置く
+## Vercel Hobby に出す
 
-Settings → Secrets and variables → Actions → **New repository secret**
+Hobby は個人・非商用なら無料です。GitHub のシークレットは Vercel には自動では入りません。同じ値を Vercel 側にも入れてください。
 
-| Name | 値 |
-| --- | --- |
-| `TYPESAFE_API_KEY` | TypeSafe で発行したキー |
+1. https://vercel.com/new を開く
+2. Import Git Repository で **ShingoHiroki/jev-test** を選ぶ
+3. Framework Preset は **Next.js** のまま
+4. Root Directory は空（リポジトリのルート）
+5. Environment Variables を追加する
+   - Name: `TYPESAFE_API_KEY`
+   - Value: TypeSafe のキー（GitHub シークレットと同じ値）
+   - Environment: Production / Preview / Development すべて
+6. **Deploy**
 
-このキーは **GitHub Pages 上では実行時に使えません。** Pages は HTML/JS を置くだけなので、隠したまま Jev を呼ぶサーバーがありません。キーを `NEXT_PUBLIC_` でフロントに埋め込むと、誰でもブラウザから盗めます。
-
-Jev 対局を公開する手順:
-
-1. GitHub シークレットに `TYPESAFE_API_KEY` を登録する（Actions の疎通確認に使う）
-2. 同じリポジトリを [Vercel](https://vercel.com/new) に Import する（Hobby ならホスティング無料）
-3. Vercel の Environment Variables にも **同じ名前・同じ値** で `TYPESAFE_API_KEY` を入れる
-4. （任意）Pages のサイトから Vercel の API を使うなら、GitHub の Actions variables に `API_BASE=https://your-app.vercel.app` を追加する
-
-1局の Jev API 代はだいたい **$0.001〜0.002** です。
-
-[![Deploy with Vercel](https://vercel.com/button)](https://vercel.com/new/clone?repository-url=https://github.com/ShingoHiroki/jev-test)
+デプロイ後の `https://….vercel.app` が Jev 対局の公開 URL です。エンジンに「Jev」が選べればキーはサーバー側で認識されています。
 
 ## 動かし方
 
