@@ -23,6 +23,7 @@ export function ChessPiece({ type, color }: { type: string; color: PieceColor })
     <svg
       className={`piece ${isWhite ? "white-piece" : "black-piece"}`}
       viewBox="0 0 45 45"
+      preserveAspectRatio="xMidYMid meet"
       aria-hidden="true"
       focusable="false"
     >
